@@ -67,6 +67,7 @@ message CreateSignedURLRequest {
 
 message CreateSignedURLResponse {
     string url = 1;
+    map<string, string> headers = 2;
 }
 
 message ObjectStoreInitRequest {
