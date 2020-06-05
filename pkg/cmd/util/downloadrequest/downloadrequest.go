@@ -138,6 +138,12 @@ Loop:
 		return err
 	}
 
+	if req.Status.Headers != nil {
+		for k, v := range req.Status.Headers {
+			httpReq.Header.Set(k, v)
+		}
+	}
+
 	// Manually set this header so the net/http library does not automatically try to decompress. We
 	// need to handle this manually because it's not currently possible to set the MIME type for the
 	// pre-signed URLs for GCP or Azure.

@@ -71,6 +71,10 @@ type DownloadRequestStatus struct {
 	// +optional
 	DownloadURL string `json:"downloadURL,omitempty"`
 
+	// Headers is for specific header added to download URL.
+	// +optional
+	Headers map[string]string `json:"headers,omitempty"`
+
 	// Expiration is when this DownloadRequest expires and can be deleted by the system.
 	// +optional
 	// +nullable
