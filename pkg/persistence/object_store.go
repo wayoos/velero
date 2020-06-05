@@ -71,7 +71,7 @@ type BackupStore interface {
 	PutRestoreResults(backup, restore string, results io.Reader) error
 	DeleteRestore(name string) error
 
-	GetDownloadURL(target velerov1api.DownloadTarget) (string, error)
+	GetDownloadURL(target velerov1api.DownloadTarget) (string, map[string]string, error)
 }
 
 // DownloadURLTTL is how long a download URL is valid for.
@@ -437,7 +437,7 @@ func (s *objectBackupStore) PutRestoreResults(backup string, restore string, res
 	return s.objectStore.PutObject(s.bucket, s.layout.getRestoreResultsKey(restore), results)
 }
 
-func (s *objectBackupStore) GetDownloadURL(target velerov1api.DownloadTarget) (string, error) {
+func (s *objectBackupStore) GetDownloadURL(target velerov1api.DownloadTarget) (string, map[string]string, error) {
 	switch target.Kind {
 	case velerov1api.DownloadTargetKindBackupContents:
 		return s.objectStore.CreateSignedURL(s.bucket, s.layout.getBackupContentsKey(target.Name), DownloadURLTTL)
@@ -452,7 +452,7 @@ func (s *objectBackupStore) GetDownloadURL(target velerov1api.DownloadTarget) (s
 	case velerov1api.DownloadTargetKindRestoreResults:
 		return s.objectStore.CreateSignedURL(s.bucket, s.layout.getRestoreResultsKey(target.Name), DownloadURLTTL)
 	default:
-		return "", errors.Errorf("unsupported download target kind %q", target.Kind)
+		return "", nil, errors.Errorf("unsupported download target kind %q", target.Kind)
 	}
 }
 

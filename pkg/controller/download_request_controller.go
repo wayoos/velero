@@ -172,7 +172,7 @@ func (c *downloadRequestController) generatePreSignedURL(downloadRequest *v1.Dow
 		return errors.WithStack(err)
 	}
 
-	if update.Status.DownloadURL, err = backupStore.GetDownloadURL(downloadRequest.Spec.Target); err != nil {
+	if update.Status.DownloadURL, update.Status.Headers, err = backupStore.GetDownloadURL(downloadRequest.Spec.Target); err != nil {
 		return err
 	}
 
