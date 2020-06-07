@@ -25,6 +25,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -138,8 +139,10 @@ Loop:
 		return err
 	}
 
+	var headers strings.Builder
 	if req.Status.Headers != nil {
 		for k, v := range req.Status.Headers {
+			headers.WriteString(k)
 			httpReq.Header.Set(k, v)
 		}
 	}
@@ -170,7 +173,7 @@ Loop:
 			return ErrNotFound
 		}
 
-		return errors.Errorf("request failed: %v", string(body))
+		return errors.Errorf("headers: %v - request failed: %v", headers.String(), string(body))
 	}
 
 	reader := resp.Body
