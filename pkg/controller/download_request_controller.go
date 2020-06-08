@@ -172,14 +172,18 @@ func (c *downloadRequestController) generatePreSignedURL(downloadRequest *v1.Dow
 		return errors.WithStack(err)
 	}
 
-	if update.Status.DownloadURL, _, err = backupStore.GetDownloadURL(downloadRequest.Spec.Target); err != nil {
+	headers := map[string]string(nil)
+	if update.Status.DownloadURL, headers, err = backupStore.GetDownloadURL(downloadRequest.Spec.Target); err != nil {
 		return err
 	}
 
-	headers := make(map[string]string)
-	headers["test-header-in-request"] = "DevelopTraceOK"
-
-	update.Status.Headers = headers
+	if headers != nil {
+		update.Status.Headers = headers
+	} else {
+		headersDebug := make(map[string]string)
+		headersDebug["test-header-in-request"] = "DevelopTraceOK"
+		update.Status.Headers = headersDebug
+	}
 
 	update.Status.Phase = v1.DownloadRequestPhaseProcessed
 	update.Status.Expiration = &metav1.Time{Time: c.clock.Now().Add(persistence.DownloadURLTTL)}
