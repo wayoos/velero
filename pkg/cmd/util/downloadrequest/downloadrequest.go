@@ -25,7 +25,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -139,10 +138,8 @@ Loop:
 		return err
 	}
 
-	var headers strings.Builder
 	if req.Status.Headers != nil {
 		for k, v := range req.Status.Headers {
-			headers.WriteString(k)
 			httpReq.Header.Set(k, v)
 		}
 	}
@@ -150,9 +147,7 @@ Loop:
 	// Manually set this header so the net/http library does not automatically try to decompress. We
 	// need to handle this manually because it's not currently possible to set the MIME type for the
 	// pre-signed URLs for GCP or Azure.
-
-	// Not compatible with AWS S3 SSE-C
-	//	httpReq.Header.Set("Accept-Encoding", "gzip")
+	httpReq.Header.Set("Accept-Encoding", "gzip")
 
 	resp, err := httpClient.Do(httpReq)
 	if err != nil {
@@ -175,7 +170,7 @@ Loop:
 			return ErrNotFound
 		}
 
-		return errors.Errorf("headers: %v - request failed: %v", headers.String(), string(body))
+		return errors.Errorf("request failed: %v", string(body))
 	}
 
 	reader := resp.Body
